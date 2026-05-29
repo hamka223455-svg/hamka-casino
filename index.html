@@ -1373,74 +1373,82 @@
             }
         }
 
-        function evaluateResults() {
-            const matrix = gameState.gridData;
-            let scatterPositions = [];
-            let winSymbolsCount = {};
-            let multiplierSum = 1;
+function evaluateResults() {
+    const matrix = gameState.gridData;
+    let scatterPositions = [];
+    let winSymbolsCount = {};
+    let multiplierSum = 1;
 
-            for(let r = 0; r < 4; r++) {
-                for(let c = 0; c < 4; r++, c++) {
-                    if (c >= 4) break;
-                    let item = matrix[r][c];
-                    if(item === SCATTER_SYMBOL) { scatterPositions.push({r, c}); } 
-                    else if(MULTIPLIERS.includes(item)) {
-                        let val = parseInt(item.replace(/[^0-9]/g, '')) || 1;
-                        multiplierSum += val;
-                        highlightCell(r, c, "winning-glow");
-                    } else {
-                        winSymbolsCount[item] = winSymbolsCount[item] || [];
-                        winSymbolsCount[item].push({r, c});
-                    }
-                }
-                if (r >= 3) r = 3;
-            }
+    // FIX: Perulangan r dan c sekarang sudah dipisah dengan benar tanpa typo r++
+    for(let r = 0; r < 4; r++) {
+        for(let c = 0; c < 4; c++) {
+            let item = matrix[r][c];
+            if(!item) continue;
 
-            let baseWinTotal = 0;
-            for(let sym in winSymbolsCount) {
-                let coords = winSymbolsCount[sym];
-                if(coords.length >= 4) {
-                    let individualWin = gameState.bet * (coords.length * 0.6);
-                    baseWinTotal += individualWin;
-                    coords.forEach(coord => highlightCell(coord.r, coord.c, "winning-glow"));
-                }
-            }
-
-            let finalPayout = Math.floor(baseWinTotal * multiplierSum);
-
-            if(scatterPositions.length >= 3) {
-                scatterPositions.forEach(coord => highlightCell(coord.r, coord.c, "scatter-glow"));
-                setTimeout(() => { triggerScatterFeature(); }, 600);
-            }
-
-            if(finalPayout > 0) {
-                gameState.balance += finalPayout;
-                if(gameState.isFreeSpinMode) gameState.totalFsWin += finalPayout;
-                document.getElementById("win-val").innerText = "Rp" + finalPayout.toLocaleString("id-ID");
-                animateBalanceDisplay(gameState.balance);
-                triggerNotification("WIN MATCH", `Hadiah Rp ${finalPayout.toLocaleString("id-ID")}`, "gold");
+            if(item === SCATTER_SYMBOL) { 
+                scatterPositions.push({r, c}); 
+            } 
+            else if(MULTIPLIERS.includes(item)) {
+                let val = parseInt(item.replace(/[^0-9]/g, '')) || 1;
+                multiplierSum += val;
+                highlightCell(r, c, "winning-glow");
             } else {
-                if(!gameState.isFreeSpinMode && scatterPositions.length < 3) { document.getElementById("win-val").innerText = "Rp0"; }
+                // Kelompokkan koordinat berdasarkan simbolnya
+                winSymbolsCount[item] = winSymbolsCount[item] || [];
+                winSymbolsCount[item].push({r, c});
             }
-
-            checkAchievementsRealtime();
-
-            setTimeout(() => {
-                clearHighlights();
-                gameState.isSpinning = false;
-                
-                if(gameState.isFreeSpinMode) {
-                    gameState.freeSpinsLeft--;
-                    document.getElementById("fs-count-val").innerText = gameState.freeSpinsLeft;
-                    if(gameState.freeSpinsLeft <= 0) endFreeSpinMode();
-                    else setTimeout(() => { startSpin(); }, 1000);
-                } else {
-                    document.getElementById("spin-btn").disabled = false;
-                    document.getElementById("bet-amount").disabled = false;
-                    if(gameState.isAutoSpin) setTimeout(() => { if(gameState.isAutoSpin) startSpin(); }, 400);
-                }
-            }, 1200);
         }
+    }
+
+    let baseWinTotal = 0;
+    // Hitung kemenangan jika ada simbol yang jumlahnya 4 atau lebih di dalam grid
+    for(let sym in winSymbolsCount) {
+        let coords = winSymbolsCount[sym];
+        if(coords.length >= 4) {
+            let individualWin = gameState.bet * (coords.length * 0.6);
+            baseWinTotal += individualWin;
+            coords.forEach(coord => highlightCell(coord.r, coord.c, "winning-glow"));
+        }
+    }
+
+    let finalPayout = Math.floor(baseWinTotal * multiplierSum);
+
+    if(scatterPositions.length >= 3) {
+        scatterPositions.forEach(coord => highlightCell(coord.r, coord.c, "scatter-glow"));
+        setTimeout(() => { triggerScatterFeature(); }, 600);
+    }
+
+    if(finalPayout > 0) {
+        gameState.balance += finalPayout;
+        if(gameState.isFreeSpinMode) gameState.totalFsWin += finalPayout;
+        document.getElementById("win-val").innerText = "Rp" + finalPayout.toLocaleString("id-ID");
+        animateBalanceDisplay(gameState.balance);
+        triggerNotification("WIN MATCH", `Hadiah Rp ${finalPayout.toLocaleString("id-ID")}`, "gold");
+    } else {
+        if(!gameState.isFreeSpinMode && scatterPositions.length < 3) { 
+            document.getElementById("win-val").innerText = "Rp0"; 
+        }
+    }
+
+    checkAchievementsRealtime();
+
+    setTimeout(() => {
+        clearHighlights();
+        gameState.isSpinning = false;
+        
+        if(gameState.isFreeSpinMode) {
+            gameState.freeSpinsLeft--;
+            document.getElementById("fs-count-val").innerText = gameState.freeSpinsLeft;
+            if(gameState.freeSpinsLeft <= 0) endFreeSpinMode();
+            else setTimeout(() => { startSpin(); }, 1000);
+        } else {
+            document.getElementById("spin-btn").disabled = false;
+            document.getElementById("bet-amount").disabled = false;
+            if(gameState.isAutoSpin) setTimeout(() => { if(gameState.isAutoSpin) startSpin(); }, 400);
+        }
+    }, 1200);
+        }
+        
 
         function highlightCell(r, c, className) {
             const reel = document.getElementById(`reel-${c}`);
