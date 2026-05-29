@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEON CASINO 4x4 - SUPREME EDITION</title>
+    <style>
+        :root {
+            --bg-dark: #07030d;
+            --panel-bg: rgba(18, 8, 30, 0.9);
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --neon-gold: #ffaa00;
+            --neon-green: #39ff14;
+            --neon-purple: #9d4edd;
+            --neon-diamond: #4dadff;
+            --text-light: #f5f3f7;
+            --neon-scatter: #ff3333;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #150727 0%, #030106 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.8s ease, box-shadow 0.8s ease;
+        }
+        body.scatter-mode {
+            background-image: radial-gradient(circle at center, #430000 0%, #0a0000 100%);
+            box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.7);
+        }
+        #auth-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 1, 8, 0.97);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #auth-container.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .auth-box {
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-purple);
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+            border-radius: 20px;
+            padding: 35px;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            backdrop-filter: blur(15px);
+        }
+        .auth-box h2 {
+            margin-bottom: 25px;
+            font-size: 26px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 12px var(--neon-cyan);
+        }
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            cursor: pointer;
+            color: #888;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .auth-tab.active {
+            color: var(--neon-cyan);
+            border-bottom: 3px solid var(--neon-cyan);
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+        .auth-form {
+            display: none;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .auth-form.active {
+            display: flex;
+        }
+        .auth-form input {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            padding: 14px;
+            border-radius: 10px;
+            color: #fff;
+            outline: none;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .auth-form input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+          }
+        .btn-premium {
+            background: linear-gradient(135deg, var(--neon-purple), #6a11cb);
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+        }
+        .btn-premium:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(157, 78, 221, 0.7);
+            filter: brightness(1.2);
+        }
+        .btn-premium:disabled {
+            background: #231c2b;
+            color: #52475e;
+            box-shadow: none;
+            cursor: not-allowed;
+            filter: none;
+        }
+        #game-container {
+            width: 100%;
+            max-width: 1250px;
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+        #game-container.visible {
+            display: flex;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            padding: 15px 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px var(--neon-magenta), 0 0 20px var(--neon-purple);
+        }
+        .logo span {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+        }
+        .user-panel {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-info {
+            font-size: 14px;
+            text-align: right;
+        }
+        .username-display {
+            font-weight: bold;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px rgba(0,240,255,0.3);
+        }
+        .level-badge {
+            background: linear-gradient(135deg, var(--neon-gold), #d4af37);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .exp-progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+        .exp-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            box-shadow: 0 0 8px var(--neon-cyan);
+            transition: width 0.3s ease;
+        }
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--neon-magenta);
+            color: var(--neon-magenta);
+            padding: 7px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-logout:hover {
+            background: var(--neon-magenta);
+            color: #fff;
+            box-shadow: 0 0 12px var(--neon-magenta);
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+        }
+        @media (max-width: 990px) {
+            .main-layout { grid-template-columns: 1fr; }
+      }
+        .slot-machine-wrapper {
+            background: var(--panel-bg);
+            border-radius: 24px;
+            border: 3px solid var(--neon-purple);
+            box-shadow: 0 0 35px rgba(157, 78, 221, 0.4), inset 0 0 25px rgba(0,0,0,0.7);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        body.scatter-mode .slot-machine-wrapper {
+            border-color: var(--neon-scatter);
+            box-shadow: 0 0 45px rgba(255, 51, 51, 0.6), inset 0 0 25px rgba(0,0,0,0.8);
+        }
+        .slot-screen {
+            width: 100%;
+            background: #010003;
+            border-radius: 16px;
+            padding: 16px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.03);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.95);
+            position: relative;
+        }
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            height: 420px;
+        }
+        .reel-column {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 10px;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.01);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+        }
+        .symbol-container {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            will-change: transform;
+        }
+        .symbol-cell {
+            height: 92px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            position: relative;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.6);
+        }
+        @keyframes blurSpin {
+            0% { filter: blur(0px); }
+            50% { filter: blur(7px); }
+            100% { filter: blur(0px); }
+        }
+        .symbol-cell.winning-glow {
+            animation: winPulse 0.5s infinite alternate;
+            z-index: 5;
+            background: rgba(255, 170, 0, 0.18);
+            border-radius: 10px;
+            box-shadow: inset 0 0 18px var(--neon-gold), 0 0 18px var(--neon-gold);
+        }
+        .symbol-cell.scatter-glow {
+            animation: scatterPulse 0.4s infinite alternate;
+            z-index: 6;
+            background: rgba(255, 51, 51, 0.25);
+            border-radius: 10px;
+            box-shadow: inset 0 0 22px var(--neon-scatter), 0 0 22px var(--neon-scatter);
+        }
+        @keyframes winPulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 3px var(--neon-gold)); }
+            100% { transform: scale(1.12); filter: drop-shadow(0 0 15px var(--neon-gold)); }
+        }
+        @keyframes scatterPulse {
+            0% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 5px var(--neon-scatter)); }
+            100% { transform: scale(1.18) rotate(3deg); filter: drop-shadow(0 0 22px var(--neon-scatter)); }
+          }
+        .side-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .stats-card {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 22px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.35);
+        }
+        .stat-item { margin-bottom: 16px; }
+        .stat-item:last-child { margin-bottom: 0; }
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #999;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+        .stat-value {
+            font-size: 26px;
+            font-weight: bold;
+            font-family: monospace;
+            color: #fff;
+            transition: color 0.3s;
+        }
+        .stat-value.highlight-cyan { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
+        .stat-value.highlight-gold { color: var(--neon-gold); text-shadow: 0 0 10px rgba(255, 170, 0, 0.4); }
+        .stat-value.highlight-magenta { color: var(--neon-magenta); text-shadow: 0 0 10px rgba(255, 0, 127, 0.4); }
+        .stat-value.highlight-diamond { color: var(--neon-diamond); text-shadow: 0 0 10px rgba(77, 173, 255, 0.4); }
+        
+        .bet-control-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .bet-input {
+            flex: 1;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--neon-cyan);
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 18px;
+            text-align: center;
+            outline: none;
+        }
+        .spin-actions-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+            width: 100%;
+            margin-top: 24px;
+        }
+        .btn-spin {
+            background: linear-gradient(135deg, #00f0ff, #0072ff);
+            border: none;
+            padding: 20px;
+            border-radius: 14px;
+            color: white;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .btn-spin:hover:not(:disabled) {
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.7);
+            filter: brightness(1.15);
+        }
+        .btn-auto-spin {
+            background: linear-gradient(135deg, #5b21b6, #7c3aed);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+        }
+        .btn-auto-spin.active {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            animation: pulseAbort 1.5s infinite;
+        }
+        @keyframes pulseAbort { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        .btn-spin:disabled, .btn-auto-spin:disabled {
+            background: #25202d !important; color: #554d60 !important; box-shadow: none !important; cursor: not-allowed;
+        }
+        body.scatter-mode .btn-spin {
+            background: linear-gradient(135deg, #ff3333, #7e0000);
+            box-shadow: 0 0 25px rgba(255, 51, 51, 0.5);
+        }
+        .luck-box { border: 1px dashed var(--neon-magenta); background: linear-gradient(135deg, rgba(255, 0, 127, 0.04), rgba(157, 78, 221, 0.04)); }
+        .rebirth-box { border: 1px dashed var(--neon-diamond); background: linear-gradient(135deg, rgba(77, 173, 255, 0.04), rgba(0, 240, 255, 0.04)); }
+        .luck-timer { font-size: 13px; color: var(--neon-magenta); font-weight: bold; margin-top: 8px; display: none; text-shadow: 0 0 6px rgba(255,0,127,0.4); }
+        
+        .tab-menu-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; width: 100%; }
+        .btn-sub-menu {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); color: #ccc;
+            padding: 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-sub-menu:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: var(--neon-cyan); }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 1, 6, 0.93);
+            z-index: 1500; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: all 0.4s; backdrop-filter: blur(8px);
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-box { background: #11081f; border: 2px solid var(--neon-purple); box-shadow: 0 0 35px rgba(157, 78, 221, 0.4); border-radius: 20px; padding: 30px; width: 90%; max-width: 500px; position: relative; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; color: #666; cursor: pointer; transition: color 0.3s; }
+        .modal-close:hover { color: #fff; }
+        .modal-title { font-size: 20px; font-weight: bold; letter-spacing: 1.5px; margin-bottom: 20px; text-align: center; color: #fff; text-shadow: 0 0 8px var(--neon-purple); }
+        
+        .shop-grid { display: flex; flex-direction: column; gap: 12px; max-height: 380px; overflow-y: auto; padding-right: 5px; }
+        .shop-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .shop-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); }
+        .shop-item-info h4 { font-size: 15px; color: #fff; margin-bottom: 3px; }
+        .shop-item-info p { font-size: 13px; color: #888; }
+        
+        .achievement-row { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 12px 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .achievement-row.unlocked { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.03); }
+        .ach-status { font-weight: bold; font-size: 12px; padding: 4px 8px; border-radius: 4px; }
+        .ach-status.locked { background: #2a1b3d; color: #a29bfe; }
+        .ach-status.unlocked { background: var(--neon-green); color: #000; }
+        
+        .notification-container { position: fixed; top: 25px; right: 25px; z-index: 3000; display: flex; flex-direction: column; gap: 12px; width: 340px; pointer-events: none; }
+        .toast { background: rgba(10, 4, 18, 0.98); border-left: 4px solid var(--neon-cyan); padding: 16px 22px; border-radius: 0 12px 12px 0; box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 15px rgba(0, 240, 255, 0.1); color: #fff; transform: translateX(135%); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.25); pointer-events: auto; }
+        .toast.visible { transform: translateX(0); }
+        .toast-title { font-weight: bold; font-size: 14px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .toast-desc { font-size: 13px; color: #ccc; line-height: 1.4; }
+        .toast.success { border-left-color: var(--neon-green); box-shadow: 0 0 12px rgba(57, 255, 20, 0.15), 0 12px 30px rgba(0,0,0,0.6); }
+        .toast.error { border-left-color: var(--neon-magenta); box-shadow: 0 0 12px rgba(255, 0, 127, 0.15), 0 12px 30px rgba(0,0,0,0.6); }
+        .toast.gold { border-left-color: var(--neon-gold); box-shadow: 0 0 12px rgba(255, 170, 0, 0.15), 0 12px 30px rgba(0,0,0,0.6); }
+        .toast.scatter { border-left-color: var(--neon-scatter); box-shadow: 0 0 12px rgba(255, 51, 51, 0.15), 0 12px 30px rgba(0,0,0,0.6); }
+        .toast.diamond { border-left-color: var(--neon-diamond); box-shadow: 0 0 12px rgba(77, 173, 255, 0.15), 0 12px 30px rgba(0,0,0,0.6); }
+        
+        .freespin-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,0,0,0.18); pointer-events: none; display: none; border-radius: 14px; box-shadow: inset 0 0 60px rgba(255,0,0,0.6); animation: overlayPulse 2s infinite alternate; }
+        @keyframes overlayPulse { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+        
+        .fs-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.4); background: rgba(2, 0, 5, 0.95); border: 3px solid var(--neon-scatter); box-shadow: 0 0 50px var(--neon-scatter); padding: 35px; border-radius: 20px; text-align: center; z-index: 100; opacity: 0; visibility: hidden; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 85%; }
+        .fs-banner.active { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+        .fs-banner h1 { color: var(--neon-scatter); font-size: 34px; margin-bottom: 12px; text-shadow: 0 0 18px rgba(255,51,51,0.7); }
+        
+        .bonus-timer-toast { position: fixed; bottom: 25px; left: 25px; background: var(--panel-bg); border: 1px solid var(--neon-green); padding: 12px 18px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.5), 0 0 12px rgba(57, 255, 20, 0.25); z-index: 999; }
+        .bonus-circle { width: 9px; height: 9px; background: var(--neon-green); border-radius: 50%; animation: pulseGlow 1s infinite alternate; }
+        @keyframes pulseGlow { 0% { transform: scale(0.8); opacity: 0.4; } 100% { transform: scale(1.4); opacity: 1; } }
+        
+        .form-transfer { display: flex; flex-direction: column; gap: 14px; }
+        .form-transfer input { background: rgba(0,0,0,0.4); border: 1px solid rgba(157, 78, 221, 0.4); padding: 12px; border-radius: 8px; color: #fff; font-size: 15px; outline: none; }
+        .form-transfer input:focus { border-color: var(--neon-cyan); }
+    </style>
+</head>
+<body>
+
+    <div id="auth-container">
+        <div class="auth-box">
+            <h2>HAMKA0 CASINO</h2>
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">LOGIN</div>
+                <div class="auth-tab" onclick="switchAuthTab('register')">DAFTAR</div>
+            </div>
+            <form id="login-form" class="auth-form active" onsubmit="handleAuth(event, 'login')">
+                <input type="text" id="login-user" placeholder="Username" required autocomplete="off">
+                <input type="password" id="login-pass" placeholder="Password" required>
+                <button type="submit" class="btn-premium">MASUK KE LOBBY</button>
+            </form>
+            <form id="register-form" class="auth-form" onsubmit="handleAuth(event, 'register')">
+                <input type="text" id="reg-user" placeholder="Buat Username" required autocomplete="off">
+                <input type="password" id="reg-pass" placeholder="Buat Password" required>
+                <button type="submit" class="btn-premium">DAFTAR & MAIN SEKARANG</button>
+            </form>
+        </div>
+    </div>
+    <div id="game-container">
+        <header>
+            <div class="logo">HAMKAx<span>CASINO</span></div>
+            <div class="user-panel">
+                <div class="user-info">
+                    ID: <span class="username-display" id="display-name">-</span>
+                    <span class="level-badge">LV <span id="level-display">1</span></span>
+                    <div class="exp-progress-container">
+                        <div class="exp-progress-bar" id="exp-bar-fill"></div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">LOGOUT</button>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <div class="slot-machine-wrapper">
+                <div class="freespin-overlay" id="fs-overlay"></div>
+                
+                <div class="fs-banner" id="fs-banner">
+                    <h1>BONUS TERPICU!</h1>
+                    <p style="font-size: 19px; color: #fff; margin-bottom: 6px;">3 SCATTER DI TEMUKAN</p>
+                    <p style="color: var(--neon-gold); font-weight: bold; font-size: 24px;">10 FREE SPINS GRATIS</p>
+                </div>
+
+                <div class="slot-screen">
+                    <div class="slot-grid" id="slot-grid-container">
+                        <div class="reel-column"><div class="symbol-container" id="reel-0"></div></div>
+                        <div class="reel-column"><div class="symbol-container" id="reel-1"></div></div>
+                        <div class="reel-column"><div class="symbol-container" id="reel-2"></div></div>
+                        <div class="reel-column"><div class="symbol-container" id="reel-3"></div></div>
+                    </div>
+                </div>
+
+                <div class="spin-actions-grid">
+                    <button class="btn-spin" id="spin-btn" onclick="startSpin()">SPIN</button>
+                    <button class="btn-auto-spin" id="auto-spin-btn" onclick="toggleAutoSpin()">AUTO</button>
+                </div>
+                
+                <div class="tab-menu-container">
+                    <button class="btn-sub-menu" onclick="toggleModal('topup-modal', true)">🛒 TOP UP DIAMOND</button>
+                    <button class="btn-sub-menu" onclick="toggleModal('joki-modal', true)">⚡ JOKI HAMKA</button>
+                    <button class="btn-sub-menu" onclick="toggleModal('transfer-modal', true)">🎁 TRADING CENTER</button>
+                    <button class="btn-sub-menu" onclick="toggleModal('achieve-modal', true)">🏆 PRESTASI</button>
+                </div>
+            </div>
+            <div class="side-controls">
+                <div class="stats-card">
+                    <div class="stat-item">
+                        <div class="stat-label">SALDO INDONESIA (RUPIAH)</div>
+                        <div class="stat-value highlight-cyan" id="balance-val">Rp0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">SALDO DIAMOND</div>
+                        <div class="stat-value highlight-diamond" id="diamond-val">0 💎</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">TOTAL KEMENANGAN</div>
+                        <div class="stat-value highlight-gold" id="win-val">Rp0</div>
+                    </div>
+                    <div class="stat-item" id="fs-counter-box" style="display: none; border: 1px solid var(--neon-scatter); padding: 12px; border-radius: 10px; background: rgba(255,0,0,0.04);">
+                        <div class="stat-label" style="color: var(--neon-scatter);">SISA FREE SPIN MODE</div>
+                        <div class="stat-value highlight-magenta" id="fs-count-val" style="color: var(--neon-scatter);">0</div>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 15px 0;">
+                    <div class="stat-label">NOMINAL TARUHAN (BET)</div>
+                    <div class="bet-control-box">
+                        <button class="btn-premium" style="padding: 12px;" onclick="adjustBet(-5000)">-</button>
+                        <input type="number" class="bet-input" id="bet-amount" value="5000" min="100" step="500">
+                        <button class="btn-premium" style="padding: 12px;" onclick="adjustBet(5000)">+</button>
+                    </div>
+                </div>
+
+                <div class="stats-card" style="background: linear-gradient(135deg, rgba(255,51,51,0.04), rgba(157,78,221,0.04)); border: 1px dashed var(--neon-scatter);">
+                    <div class="stat-item">
+                        <div class="stat-label" style="color: var(--neon-scatter);">BELI FITUR SCATTER INSTAN</div>
+                        <p style="font-size: 11px; color: #aaa; margin-bottom: 12px;">Beli putaran langsung memicu mode 10x Free Spin secara paksa.</p>
+                        <div class="stat-label">HARGA AMBIL SCATTER</div>
+                        <div class="stat-value highlight-magenta" id="scatter-price-val" style="color: var(--neon-scatter);">500 💎</div>
+                    </div>
+                    <button class="btn-premium" id="buy-scatter-btn" style="width: 100%; background: linear-gradient(135deg, var(--neon-scatter), #7e0000);" onclick="buyScatterInstan()">BELI SCATTER</button>
+                </div>
+
+                <div class="stats-card luck-box">
+                    <div class="stat-item">
+                        <div class="stat-label" style="color: var(--neon-magenta);">BOOST LUCK (1 MENIT)</div>
+                        <p style="font-size: 11px; color: #aaa; margin-bottom: 12px;">Menembus pertahanan sistem RTP buruk secara adil, menaikkan persentase kedatangan multiplier.</p>
+                        <div class="stat-label">HARGA AMBIL FITUR</div>
+                        <div class="stat-value highlight-magenta" id="luck-price-val">10,000 💎</div>
+                    </div>
+                    <button class="btn-premium" id="buy-luck-btn" style="width: 100%; background: linear-gradient(135deg, var(--neon-magenta), #9d4edd);" onclick="buyLuck()">BOOST LUCK NOW</button>
+                    <div class="luck-timer" id="luck-timer-display">WAKTU AKTIF: 60s</div>
+                </div>
+
+                <div class="stats-card rebirth-box">
+                    <div class="stat-item">
+                        <div class="stat-label" style="color: var(--neon-diamond);">KELAHIRAN KEMBALI (REBIRTH)</div>
+                        <p style="font-size: 11px; color: #aaa; margin-bottom: 12px;">Naikkan Level +1. Reset Saldo IDR & Diamond Anda menjadi awal. Dapatkan buff keberuntungan permanen.</p>
+                        <div class="stat-label">HARGA REBIRTH</div>
+                        <div class="stat-value highlight-diamond" id="rebirth-price-val">1,000,000 💎</div>
+                        <div class="stat-label" style="margin-top:8px; color: var(--neon-green);">BUFF SCATTER AKTIF: <span id="rebirth-buff-val">0%</span></div>
+                    </div>
+                    <button class="btn-premium" id="rebirth-btn" style="width: 100%; background: linear-gradient(135deg, #0072ff, var(--neon-cyan));" onclick="triggerRebirth()">KELAHIRAN KEMBALI</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL 1: STORE TOPUP -->
+    <div class="modal-overlay" id="topup-modal">
+        <div class="modal-box">
+            <div class="modal-close" onclick="toggleModal('topup-modal', false)">&times;</div>
+            <div class="modal-title">💎 TOP UP DIAMOND STORE</div>
+            <div class="shop-grid">
+                <div class="shop-item"><div class="shop-item-info"><h4>50 Diamond</h4><p>Harga: Rp100.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(50, 100000)">BELI</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>300 Diamond</h4><p>Harga: Rp500.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(300, 500000)">BELI</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>500 Diamond</h4><p>Harga: Rp1.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(500, 1000000)">BELI</button></div>
+                <div class="shop-item" style="border: 1px solid var(--neon-cyan); background: rgba(0,240,255,0.02);"><div class="shop-item-info"><h4 style="color:var(--neon-cyan)">10.000 Diamond</h4><p>Harga: Rp1.000.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(10000, 1000000000)">BELI</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>600 Diamond</h4><p>Harga: Rp5.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(600, 5000000)">BELI</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>650 Diamond</h4><p>Harga: Rp7.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(650, 7000000)">BELI</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>780 Diamond</h4><p>Harga: Rp15.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(780, 15000000)">BELI</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>900 Diamond</h4><p>Harga: Rp50.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(900, 50000000)">BELI</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>1000 Diamond</h4><p>Harga: Rp100.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="buyDiamond(1000, 100000000)">BELI</button></div>
+                <div class="shop-item" style="border: 1px solid var(--neon-gold); background: rgba(255,170,0,0.03);">
+                    <div class="shop-item-info"><h4 style="color:var(--neon-gold)">1.000.000 Diamond</h4><p>Harga: Rp1.000.000.000.000</p></div>
+                    <button class="btn-premium" style="padding:8px 15px; background: linear-gradient(135deg, var(--neon-gold), #d4af37); color:#000;" onclick="buyDiamond(1000000, 1000000000000)">BELI</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: JOKI HAMKA -->
+    <div class="modal-overlay" id="joki-modal">
+        <div class="modal-box">
+            <div class="modal-close" onclick="toggleModal('joki-modal', false)">&times;</div>
+            <div class="modal-title">⚡ LAYANAN JOKI HAMKA PREMIUM</div>
+            <div class="shop-grid">
+                <div class="shop-item"><div class="shop-item-info"><h4>UP SALDO 100K</h4><p>Biaya: Rp20.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="purchaseJoki('UP 100K', 20000, 100000)">AMBIL</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>UP SALDO 500K</h4><p>Biaya: Rp50.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="purchaseJoki('UP 500K', 50000, 500000)">AMBIL</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>UP SALDO 5JT</h4><p>Biaya: Rp500.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="purchaseJoki('UP 5JT', 500000, 5000000)">AMBIL</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>UP SALDO 100JT</h4><p>Biaya: Rp10.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="purchaseJoki('UP 100JT', 10000000, 100000000)">AMBIL</button></div>
+                <div class="shop-item"><div class="shop-item-info"><h4>UP SALDO 1M</h4><p>Biaya: Rp200.000.000</p></div><button class="btn-premium" style="padding:8px 15px;" onclick="purchaseJoki('UP 1M', 200000000, 1000000000)">AMBIL</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: TRADING CENTER TRADING VOUCHER (RUPIAH & DIAMOND) -->
+    <div class="modal-overlay" id="transfer-modal">
+        <div class="modal-box">
+            <div class="modal-close" onclick="toggleModal('transfer-modal', false)">&times;</div>
+            <div class="modal-title">🎁 NEON TRADING CENTER</div>
+            
+            <div class="auth-tabs" style="margin-bottom: 15px;">
+                <div class="auth-tab active" id="tab-make-code" onclick="switchTransferTab('make')">BUAT KODE</div>
+                <div class="auth-tab" id="tab-claim-code" onclick="switchTransferTab('claim')">KLAIM KODE</div>
+            </div>
+
+            <!-- SUB-FORM: GENERATE CODES -->
+            <div class="form-transfer" id="form-make-code" style="display: flex;">
+                <p style="font-size: 11px; color:#aaa;">Pilih jenis mata uang untuk dikonversi menjadi voucher kode redeem lokal:</p>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 5px;">
+                    <button class="btn-sub-menu" id="btn-mode-idr" style="border-color: var(--neon-cyan); color:#fff;" onclick="setTransferAssetMode('IDR')">SALDO RUPIAH</button>
+                    <button class="btn-sub-menu" id="btn-mode-dia" onclick="setTransferAssetMode('DIA')">SALDO DIAMOND</button>
+                </div>
+                
+                <input type="number" id="tf-redeem-amount" placeholder="Nominal Saldo Rupiah (Rp)" min="1000">
+                <button type="button" class="btn-premium" id="action-make-btn" onclick="generateTradingCode()">BUAT VOUCHER REDEEM</button>
+                
+                <div id="generated-code-box" style="display:none; margin-top: 10px; padding: 12px; background: rgba(0,240,255,0.06); border: 1px dashed var(--neon-cyan); border-radius: 8px; text-align: center;">
+                    <span style="font-size: 11px; color: #999; display:block;" id="generated-title-txt">KODE REDEEM BERHASIL:</span>
+                    <strong id="generated-code-text" style="font-size: 20px; color: var(--neon-cyan); font-family: monospace; letter-spacing: 2px;">-</strong>
+                    <p style="font-size: 10px; color: var(--neon-magenta); margin-top: 5px;">*Voucher tersimpan, bisa ditukarkan oleh akun manapun kapan saja.</p>
+                </div>
+            </div>
+
+            <!-- SUB-FORM: CLAIM CODES -->
+            <div class="form-transfer" id="form-claim-code" style="display: none;">
+                <p style="font-size: 12px; color:#aaa; margin-bottom:5px;">Masukkan kode redeem kupon Rupiah (HMK-RDM) atau Diamond (HMK-DIA) untuk dicairkan.</p>
+                <input type="text" id="tf-input-code" placeholder="Masukkan Kode Voucher (Contoh: HMK-XXXX-XXXXXX)" autocomplete="off" style="text-transform: uppercase;">
+                <button type="button" class="btn-premium" style="background: linear-gradient(135deg, var(--neon-green), #1b9a04); color: #000;" onclick="claimTradingCode()">KLAIM ASSET NOW</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: PRESTASI -->
+    <div class="modal-overlay" id="achieve-modal">
+        <div class="modal-box">
+            <div class="modal-close" onclick="toggleModal('achieve-modal', false)">&times;</div>
+            <div class="modal-title">🏆 PRESTASI PENCAPAIAN GAME</div>
+            <div style="max-height: 380px; overflow-y: auto;" id="achievements-list-container">
+                <!-- PRESTASI LAMA -->
+                <div class="achievement-row" id="ach-m1M"><div><h4>Prestasi 1.000.000</h4><p style="font-size:12px; color:#aaa;">Raih total uang menyentuh Rp1.000.000</p></div><div id="badge-container-m1M"></div></div>
+                <div class="achievement-row" id="ach-lv10"><div><h4>Prestasi Level 10</h4><p style="font-size:12px; color:#aaa;">Berhasil Rebirth hingga mencapai Level 10</p></div><div id="badge-container-lv10"></div></div>
+                <div class="achievement-row" id="ach-lv50"><div><h4>Prestasi Level 50</h4><p style="font-size:12px; color:#aaa;">Berhasil Rebirth hingga mencapai Level 50</p></div><div id="badge-container-lv50"></div></div>
+                <div class="achievement-row" id="ach-lv100"><div><h4>Prestasi Penamat Game</h4><p style="font-size:12px; color:#aaa;">Tamatkan Game pada Level 100 (Reset Data!)</p></div><div id="badge-container-lv100"></div></div>
+                <div class="achievement-row" id="ach-king"><div><h4>Prestasi The King Game</h4><p style="font-size:12px; color:#aaa;">Mencapai nominal uang Rp50.000.000.000.000</p></div><div id="badge-container-king"></div></div>
+                <!-- PRESTASI BARU -->
+                <div class="achievement-row" id="ach-diaKing"><div><h4>Prestasi Diamond King</h4><p style="font-size:12px; color:#aaa;">Memiliki saldo Diamond menyentuh 5.000 💎</p></div><div id="badge-container-diaKing"></div></div>
+                <div class="achievement-row" id="ach-empDia"><div><h4>Prestasi Emperor Diamond</h4><p style="font-size:12px; color:#aaa;">Memiliki saldo Diamond menyentuh 1.000.000 💎</p></div><div id="badge-container-empDia"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notif-box"></div>
+    <div class="bonus-timer-toast"><div class="bonus-circle"></div><div>Bonus Aktif 5 Menit: <span id="bonus-countdown" style="font-family: monospace; font-weight: bold; color: var(--neon-green);">05:00</span></div></div>
+    <script>
+        const POOL_SIMBOLS = ["💎", "🍒", "🍋", "🔔", "⭐", "🍀", "7️⃣", "🍇"];
+        const SCATTER_SYMBOL = "🀄";
+        const MULTIPLIERS = ["×1", "×2", "×3", "×4"];
+
+        let currentUser = null;
+        let dbUsers = JSON.parse(localStorage.getItem("neon_slot_v4_db")) || {};
+        let activeSession = localStorage.getItem("neon_slot_v4_session");
+
+        let gameState = {
+            balance: 10000,
+            diamonds: 0,
+            bet: 5000,
+            isSpinning: false,
+            isAutoSpin: false,
+            buyLuckCount: 0,
+            buyScatterCount: 0,
+            level: 1,
+            exp: 0,
+            luckEndTime: 0,
+            isLuckActive: false,
+            freeSpinsLeft: 0,
+            isFreeSpinMode: false,
+            totalFsWin: 0,
+            gridData: [],
+            // DB KLAIM HADIAH PRESTASI SEBESAR 100 DIAMOND
+            achievements: { m1M: false, lv10: false, lv50: false, lv100: false, king: false, diaKing: false, empDia: false },
+            claimedAch: { m1M: false, lv10: false, lv50: false, lv100: false, king: false, diaKing: false, empDia: false }
+        };
+
+        let currentAssetTransferMode = "IDR"; // Mode default buat voucher
+        let bonusTimerInterval;
+        let luckTimerInterval;
+        let balanceAnimateTimeout;
+        let diamondAnimateTimeout;
+
+        window.onload = function() {
+            if (activeSession && dbUsers[activeSession]) {
+                loadUserData(activeSession);
+            } else {
+                document.getElementById("auth-container").classList.remove("hidden");
+            }
+            initGrid();
+            startBonusTracker();
+        };
+
+        function switchAuthTab(tab) {
+            document.querySelectorAll('#auth-container .auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('#auth-container .auth-form').forEach(f => f.classList.remove('active'));
+            if(tab === 'login') {
+                document.querySelectorAll('#auth-container .auth-tab')[0].classList.add('active');
+                document.getElementById('login-form').classList.add('active');
+            } else {
+                document.querySelectorAll('#auth-container .auth-tab')[1].classList.add('active');
+                document.getElementById('register-form').classList.add('active');
+            }
+        }
+        function toggleModal(id, show) {
+            const el = document.getElementById(id);
+            if(show) {
+                el.classList.add("active");
+                if(id === 'achieve-modal') refreshAchievementsUI();
+            }
+            else el.classList.remove("active");
+        }
+
+        function triggerNotification(title, desc, type = 'info') {
+            const container = document.getElementById("notif-box");
+            const el = document.createElement("div");
+            el.className = `toast ${type}`;
+            el.innerHTML = `<div class="toast-title">${title}</div><div class="toast-desc">${desc}</div>`;
+            container.appendChild(el);
+            setTimeout(() => el.classList.add("visible"), 30);
+            setTimeout(() => {
+                el.classList.remove("visible");
+                setTimeout(() => el.remove(), 400);
+            }, 4500);
+        }
+
+        function handleAuth(e, type) {
+            e.preventDefault();
+            if(type === 'login') {
+                const u = document.getElementById("login-user").value.trim();
+                const p = document.getElementById("login-pass").value;
+                if(dbUsers[u] && dbUsers[u].password === p) {
+                    localStorage.setItem("neon_slot_v4_session", u);
+                    loadUserData(u);
+                    triggerNotification("Selamat Datang", `Halo ${u}, sesi permainan dimuat!`, "success");
+                } else {
+                    triggerNotification("Akses Ditolak", "Identitas login salah!", "error");
+                }
+            } else {
+                const u = document.getElementById("reg-user").value.trim();
+                const p = document.getElementById("reg-pass").value;
+                if(dbUsers[u]) {
+                    triggerNotification("Registrasi Gagal", "Username tersebut sudah dipakai!", "error");
+                    return;
+                }
+                dbUsers[u] = {
+                    username: u, password: p, balance: 10000, diamonds: 0, buyLuckCount: 0, buyScatterCount: 0, level: 1, exp: 0, luckEndTime: 0,
+                    achievements: { m1M: false, lv10: false, lv50: false, lv100: false, king: false, diaKing: false, empDia: false },
+                    claimedAch: { m1M: false, lv10: false, lv50: false, lv100: false, king: false, diaKing: false, empDia: false }
+                };
+                localStorage.setItem("neon_slot_v4_db", JSON.stringify(dbUsers));
+                localStorage.setItem("neon_slot_v4_session", u);
+                loadUserData(u);
+                triggerNotification("Registrasi Sukses", `Selamat bergabung di lobby, ${u}!`, "success");
+            }
+        }
+
+        function loadUserData(username) {
+            const data = dbUsers[username];
+            currentUser = username;
+            gameState.balance = data.balance ?? 10000;
+            gameState.diamonds = data.diamonds ?? 0;
+            gameState.buyLuckCount = data.buyLuckCount ?? 0;
+            gameState.buyScatterCount = data.buyScatterCount ?? 0;
+            gameState.level = data.level ?? 1;
+            gameState.exp = data.exp ?? 0;
+            gameState.luckEndTime = data.luckEndTime ?? 0;
+            gameState.achievements = data.achievements || { m1M: false, lv10: false, lv50: false, lv100: false, king: false, diaKing: false, empDia: false };
+            gameState.claimedAch = data.claimedAch || { m1M: false, lv10: false, lv50: false, lv100: false, king: false, diaKing: false, empDia: false };
+            
+            document.getElementById("auth-container").classList.add("hidden");
+            document.getElementById("game-container").classList.add("visible");
+            document.getElementById("display-name").innerText = currentUser;
+            document.getElementById("level-display").innerText = gameState.level;
+            
+            animateBalanceDisplay(gameState.balance);
+            animateDiamondDisplay(gameState.diamonds);
+            updateStoreUI();
+            updateExpBarUI();
+            checkAchievementsRealtime();
+            
+            const now = Date.now();
+            if(gameState.luckEndTime > now) {
+                activateLuckSustained(gameState.luckEndTime - now);
+            }
+        }
+
+        function saveUserData() {
+            if(!currentUser) return;
+            dbUsers[currentUser].balance = gameState.balance;
+            dbUsers[currentUser].diamonds = gameState.diamonds;
+            dbUsers[currentUser].buyLuckCount = gameState.buyLuckCount;
+            dbUsers[currentUser].buyScatterCount = gameState.buyScatterCount;
+            dbUsers[currentUser].level = gameState.level;
+            dbUsers[currentUser].exp = gameState.exp;
+            dbUsers[currentUser].luckEndTime = gameState.luckEndTime;
+            dbUsers[currentUser].achievements = gameState.achievements;
+            dbUsers[currentUser].claimedAch = gameState.claimedAch;
+            localStorage.setItem("neon_slot_v4_db", JSON.stringify(dbUsers));
+      }
+        function logout() {
+            localStorage.removeItem("neon_slot_v4_session");
+            currentUser = null;
+            gameState.isAutoSpin = false;
+            document.getElementById("auto-spin-btn").classList.remove("active");
+            document.getElementById("game-container").classList.remove("visible");
+            document.getElementById("auth-container").classList.remove("hidden");
+            if(luckTimerInterval) clearInterval(luckTimerInterval);
+            document.getElementById("luck-timer-display").style.display = "none";
+            gameState.isLuckActive = false;
+        }
+
+        function animateBalanceDisplay(target) {
+            const el = document.getElementById("balance-val");
+            let current = parseInt(el.innerText.replace(/[^0-9]/g, '')) || 0;
+            if(current === target) {
+                el.innerText = "Rp" + target.toLocaleString("id-ID");
+                return;
+            }
+            let step = Math.ceil(Math.abs(target - current) / 6);
+            current = (current < target) ? Math.min(current + step, target) : Math.max(current - step, target);
+            el.innerText = "Rp" + current.toLocaleString("id-ID");
+            clearTimeout(balanceAnimateTimeout);
+            balanceAnimateTimeout = setTimeout(() => animateBalanceDisplay(target), 20);
+        }
+
+        function animateDiamondDisplay(target) {
+            const el = document.getElementById("diamond-val");
+            let current = parseInt(el.innerText.replace(/[^0-9]/g, '')) || 0;
+            if(current === target) {
+                el.innerText = target.toLocaleString("id-ID") + " 💎";
+                return;
+            }
+            let step = Math.ceil(Math.abs(target - current) / 6);
+            current = (current < target) ? Math.min(current + step, target) : Math.max(current - step, target);
+            el.innerText = current.toLocaleString("id-ID") + " 💎";
+            clearTimeout(diamondAnimateTimeout);
+            diamondAnimateTimeout = setTimeout(() => animateDiamondDisplay(target), 20);
+        }
+
+        function updateStoreUI() {
+            const luckPrice = 10000 + (gameState.buyLuckCount * 1000);
+            document.getElementById("luck-price-val").innerText = luckPrice.toLocaleString("id-ID") + " 💎";
+            
+            const scatterPrice = 500 + (gameState.buyScatterCount * 500);
+            document.getElementById("scatter-price-val").innerText = scatterPrice.toLocaleString("id-ID") + " 💎";
+            
+            // HARGA REBIRTH PROGRESID MENINGKAT: AWAL 1JT LALU MENJADI 2JT, 3JT, DST.
+            const rebirthPrice = gameState.level * 1000000;
+            document.getElementById("rebirth-price-val").innerText = rebirthPrice.toLocaleString("id-ID") + " 💎";
+            
+            document.getElementById("rebirth-buff-val").innerText = `+${(gameState.level - 1) * 5}%`;
+            document.getElementById("level-display").innerText = gameState.level;
+        }
+
+        function adjustBet(amount) {
+            if(gameState.isFreeSpinMode) return;
+            let currentBet = parseInt(document.getElementById("bet-amount").value) || 0;
+            currentBet += amount;
+            if(currentBet < 100) currentBet = 100;
+            document.getElementById("bet-amount").value = currentBet;
+            gameState.bet = currentBet;
+        }
+
+        function buyDiamond(amount, cost) {
+            if(gameState.balance < cost) {
+                triggerNotification("Gagal Top Up", "Saldo Rupiah Anda tidak mencukupi transaksi.", "error");
+                return;
+            }
+            gameState.balance -= cost;
+            gameState.diamonds += amount;
+            animateBalanceDisplay(gameState.balance);
+            animateDiamondDisplay(gameState.diamonds);
+            triggerNotification("Top Up Sukses", `Berhasil menambah ${amount.toLocaleString("id-ID")} Diamond!`, "diamond");
+            checkAchievementsRealtime();
+            saveUserData();
+        }
+
+        function buyLuck() {
+            if(gameState.isFreeSpinMode) return;
+            const price = 10000 + (gameState.buyLuckCount * 1000);
+            if(gameState.diamonds < price) {
+                triggerNotification("Diamond Kurang", "Kumpulkan Diamond terlebih dahulu.", "error");
+                return;
+            }
+            gameState.diamonds -= price;
+            gameState.luckEndTime = Date.now() + 60000;
+            gameState.isLuckActive = true;
+            animateDiamondDisplay(gameState.diamonds);
+            triggerNotification("Boost Luck Aktif", "RTP buruk ditembus! Peluang bonus naik berimbang.", "gold");
+            
+            activateLuckSustained(60000);
+            gameState.buyLuckCount++;
+            updateStoreUI();
+            saveUserData();
+        }
+
+        function activateLuckSustained(durationLeft) {
+            gameState.isLuckActive = true;
+            const display = document.getElementById("luck-timer-display");
+            display.style.display = "block";
+            if(luckTimerInterval) clearInterval(luckTimerInterval);
+            
+            let endsAt = Date.now() + durationLeft;
+            luckTimerInterval = setInterval(() => {
+                let remaining = Math.ceil((endsAt - Date.now()) / 1000);
+                if(remaining <= 0) {
+                    clearInterval(luckTimerInterval);
+                    display.style.display = "none";
+                    gameState.isLuckActive = false;
+                    triggerNotification("Boost Selesai", "Efek hoki dinonaktifkan kembali normal.", "error");
+                    gameState.luckEndTime = 0;
+                    saveUserData();
+                } else {
+                    display.innerText = `WAKTU AKTIF: ${remaining}s`;
+                }
+            }, 250);
+        }
+
+        function buyScatterInstan() {
+            if(gameState.isFreeSpinMode || gameState.isSpinning) return;
+            const price = 500 + (gameState.buyScatterCount * 500);
+            if(gameState.diamonds < price) {
+                triggerNotification("Gagal Beli", "Diamond Anda tidak mencukupi.", "error");
+                return;
+            }
+            gameState.diamonds -= price;
+            gameState.buyScatterCount++;
+            animateDiamondDisplay(gameState.diamonds);
+            updateStoreUI();
+            saveUserData();
+            
+            triggerScatterFeature();
+        }
+
+        function triggerRebirth() {
+            const cost = gameState.level * 1000000;
+            if(gameState.diamonds < cost) {
+                triggerNotification("Gagal Rebirth", `Butuh ${cost.toLocaleString("id-ID")} Diamond.`, "error");
+                return;
+            }
+            if(gameState.level >= 100) {
+                triggerNotification("Level Maksimal", "Gunakan penamatan game otomatis.", "error");
+                return;
+            }
+
+            // KUNCI AMAN: BOOST LUCK DAN BUY SCATTER COUNT TIDAK RESETS SAAT REBIRTH
+            const currentLuckCount = gameState.buyLuckCount;
+            const currentScatterCount = gameState.buyScatterCount;
+            const currentLuckEndTime = gameState.luckEndTime;
+            const currentLuckState = gameState.isLuckActive;
+
+            gameState.balance = 10000;
+            gameState.diamonds = 0;
+            gameState.level += 1;
+            gameState.exp = 0;
+            
+            // Kembalikan datanya dengan utuh tanpa dipotong sedikitpun
+            gameState.buyLuckCount = currentLuckCount;
+            gameState.buyScatterCount = currentScatterCount;
+            gameState.luckEndTime = currentLuckEndTime;
+            gameState.isLuckActive = currentLuckState;
+            
+            animateBalanceDisplay(gameState.balance);
+            animateDiamondDisplay(gameState.diamonds);
+            updateStoreUI();
+            updateExpBarUI();
+            triggerNotification("Kelahiran Kembali!", `Level Naik ke ${gameState.level}. Progress upgrade toko aman!`, "success");
+            checkAchievementsRealtime();
+            saveUserData();
+      }
+        function updateExpBarUI() {
+            const bar = document.getElementById("exp-bar-fill");
+            bar.style.width = `${gameState.exp}%`;
+        }
+
+        function addExperience(amount) {
+            if(gameState.isFreeSpinMode) return;
+            let expGained = Math.floor(amount / 500); 
+            if(expGained < 1) expGained = 1;
+            gameState.exp += expGained;
+            if(gameState.exp >= 100) {
+                gameState.exp = 0;
+                gameState.level += 1;
+                triggerNotification("LEVEL UP!", `Selamat, level kamu naik ke LV ${gameState.level}`, "success");
+                updateStoreUI();
+            }
+            updateExpBarUI();
+        }
+
+        function switchTransferTab(target) {
+            const tabMake = document.getElementById("tab-make-code");
+            const tabClaim = document.getElementById("tab-claim-code");
+            const formMake = document.getElementById("form-make-code");
+            const formClaim = document.getElementById("form-claim-code");
+
+            if(target === 'make') {
+                tabMake.classList.add("active"); tabClaim.classList.remove("active");
+                formMake.style.display = "flex"; formClaim.style.display = "none";
+            } else {
+                tabMake.classList.remove("active"); tabClaim.classList.add("active");
+                formMake.style.display = "none"; formClaim.style.display = "flex";
+            }
+        }
+
+        function setTransferAssetMode(mode) {
+            currentAssetTransferMode = mode;
+            const btnIdr = document.getElementById("btn-mode-idr");
+            const btnDia = document.getElementById("btn-mode-dia");
+            const inputField = document.getElementById("tf-redeem-amount");
+
+            if(mode === 'IDR') {
+                btnIdr.style.borderColor = "var(--neon-cyan)"; btnIdr.style.color = "#fff";
+                btnDia.style.borderColor = "rgba(255,255,255,0.08)"; btnDia.style.color = "#ccc";
+                inputField.placeholder = "Nominal Saldo Rupiah (Rp)";
+            } else {
+                btnDia.style.borderColor = "var(--neon-diamond)"; btnDia.style.color = "#fff";
+                btnIdr.style.borderColor = "rgba(255,255,255,0.08)"; btnIdr.style.color = "#ccc";
+                inputField.placeholder = "Nominal Saldo Diamond (💎)";
+            }
+        }
+
+        function generateTradingCode() {
+            const amount = parseInt(document.getElementById("tf-redeem-amount").value) || 0;
+            if(amount <= 0) {
+                triggerNotification("Gagal Buat", "Nominal pembuatan harus valid!", "error");
+                return;
+            }
+
+            if(currentAssetTransferMode === 'IDR') {
+                if(gameState.balance < amount) {
+                    triggerNotification("Saldo Kurang", "Saldo Rupiah tidak mencukupi.", "error");
+                    return;
+                }
+                gameState.balance -= amount;
+                animateBalanceDisplay(gameState.balance);
+            } else {
+                if(gameState.diamonds < amount) {
+                    triggerNotification("Diamond Kurang", "Saldo Diamond tidak mencukupi.", "error");
+                    return;
+                }
+                gameState.diamonds -= amount;
+                animateDiamondDisplay(gameState.diamonds);
+            }
+
+            const randomID = Math.floor(100000 + Math.random() * 900000);
+            const prefix = (currentAssetTransferMode === 'IDR') ? "RDM" : "DIA";
+            const finalCode = `HMK-${prefix}-${randomID}`;
+
+            let tradingPool = JSON.parse(localStorage.getItem("neon_slot_v4_trade_pool")) || {};
+            tradingPool[finalCode] = { nominal: amount, assetType: currentAssetTransferMode, creator: currentUser, status: "ACTIVE" };
+            localStorage.setItem("neon_slot_v4_trade_pool", JSON.stringify(tradingPool));
+
+            document.getElementById("generated-code-box").style.display = "block";
+            document.getElementById("generated-code-text").innerText = finalCode;
+            document.getElementById("generated-title-txt").innerText = `VOUCHER ${currentAssetTransferMode} BERHASIL:`;
+            
+            triggerNotification("Voucher Dibuat", "Berhasil mencairkan kode aset baru!", "success");
+            saveUserData();
+            document.getElementById("tf-redeem-amount").value = "";
+        }
+
+        function claimTradingCode() {
+            const inputCode = document.getElementById("tf-input-code").value.trim().toUpperCase();
+            if(inputCode === "") return;
+
+            let tradingPool = JSON.parse(localStorage.getItem("neon_slot_v4_trade_pool")) || {};
+            if(!tradingPool[inputCode]) {
+                triggerNotification("Klaim Gagal", "Kode salah atau tidak terdaftar!", "error");
+                return;
+            }
+
+            const voucher = tradingPool[inputCode];
+            if(voucher.status !== "ACTIVE") {
+                triggerNotification("Klaim Gagal", "Kupon voucher ini sudah hangus terpakai!", "error");
+                return;
+            }
+
+            if(voucher.assetType === 'IDR') {
+                gameState.balance += voucher.nominal;
+                animateBalanceDisplay(gameState.balance);
+                triggerNotification("Klaim Sukses", `Dana Rp${voucher.nominal.toLocaleString("id-ID")} masuk!`, "success");
+            } else {
+                gameState.diamonds += voucher.nominal;
+                animateDiamondDisplay(gameState.diamonds);
+                triggerNotification("Klaim Sukses", `Aset ${voucher.nominal.toLocaleString("id-ID")} Diamond masuk!`, "diamond");
+            }
+
+            voucher.status = "USED";
+            voucher.claimedBy = currentUser;
+            localStorage.setItem("neon_slot_v4_trade_pool", JSON.stringify(tradingPool));
+
+            document.getElementById("tf-input-code").value = "";
+            toggleModal('transfer-modal', false);
+            
+            checkAchievementsRealtime();
+            saveUserData();
+        }
+
+        function checkAchievementsRealtime() {
+            let changed = false;
+            if(!gameState.achievements.m1M && gameState.balance >= 1000000) { gameState.achievements.m1M = true; changed = true; }
+            if(!gameState.achievements.lv10 && gameState.level >= 10) { gameState.achievements.lv10 = true; changed = true; }
+            if(!gameState.achievements.king && gameState.balance >= 50000000000000) { gameState.achievements.king = true; changed = true; }
+            
+            // LOGIKA PRESTASI BARU DIAMOND KAMPION
+            if(!gameState.achievements.diaKing && gameState.diamonds >= 5000) {
+                gameState.achievements.diaKing = true;
+                triggerNotification("Prestasi Terbuka", "Mendapatkan medali Diamond King!", "gold");
+                changed = true;
+            }
+            if(!gameState.achievements.empDia && gameState.diamonds >= 1000000) {
+                gameState.achievements.empDia = true;
+                triggerNotification("🏆 EMPEROR DIAMOND", "Penguasa Diamond Tertinggi Kasino!", "diamond");
+                changed = true;
+            }
+
+            if(gameState.level >= 100) {
+                gameState.achievements.lv100 = true;
+                saveUserData();
+                alert("🏆 GAME SELESAI LEVEL 100! Data saldo awal di-reset kembali.");
+                gameState.level = 1; gameState.balance = 10000; gameState.diamonds = 0;
+                animateBalanceDisplay(gameState.balance); animateDiamondDisplay(gameState.diamonds);
+                updateStoreUI(); changed = true;
+            }
+            if(changed) saveUserData();
+        }
+
+        function claimAchievementReward(achKey) {
+            if(!gameState.achievements[achKey] || gameState.claimedAch[achKey]) return;
+            
+            gameState.claimedAch[achKey] = true;
+            gameState.diamonds += 100;
+            animateDiamondDisplay(gameState.diamonds);
+            triggerNotification("Hadiah Diklaim", "+100 Diamond Bonus Berhasil Masuk!", "diamond");
+            
+            refreshAchievementsUI();
+            saveUserData();
+        }
+
+        function refreshAchievementsUI() {
+            const list = [
+                { id: "m1M", key: "m1M", title: "Prestasi 1M Saldo" },
+                { id: "lv10", key: "lv10", title: "Prestasi Level 10" },
+                { id: "lv50", key: "lv50", title: "Prestasi Level 50" },
+                { id: "lv100", key: "lv100", title: "Prestasi Penamat" },
+                { id: "king", key: "king", title: "Prestasi The King Game" },
+                { id: "diaKing", key: "diaKing", title: "Prestasi Diamond King" },
+                { id: "empDia", key: "empDia", title: "Prestasi Emperor Diamond" }
+            ];
+
+            list.forEach(item => {
+                const container = document.getElementById(`badge-container-${item.id}`);
+                if(!container) return;
+
+                const hasUnlocked = gameState.achievements[item.key];
+                const hasClaimed = gameState.claimedAch[item.key];
+
+                if(!hasUnlocked) {
+                    container.innerHTML = `<span class="ach-status locked">Terkunci</span>`;
+                } else if(hasUnlocked && !hasClaimed) {
+                    container.innerHTML = `<button class="btn-premium" style="padding:6px 12px; background:linear-gradient(135deg, var(--neon-green), #14930a); color:#000; font-size:11px;" onclick="claimAchievementReward('${item.key}')">KLAIM 100💎</button>`;
+                } else {
+                    container.innerHTML = `<span class="ach-status unlocked" style="background:#444; color:#aaa;">Selesai (Diterima)</span>`;
+                }
+            });
+        }
+
+        function toggleAutoSpin() {
+            if(gameState.isFreeSpinMode) return;
+            gameState.isAutoSpin = !gameState.isAutoSpin;
+            const btn = document.getElementById("auto-spin-btn");
+            if(gameState.isAutoSpin) {
+                btn.classList.add("active"); btn.innerText = "STOP";
+                if(!gameState.isSpinning) startSpin();
+            } else {
+                btn.classList.remove("active"); btn.innerText = "AUTO";
+            }
+        }
+
+        function purchaseJoki(tipe, biaya, reward) {
+            if(gameState.balance < biaya) {
+                triggerNotification("Joki Gagal", "Uang Anda tidak cukup.", "error");
+                return;
+            }
+            gameState.balance -= biaya;
+            animateBalanceDisplay(gameState.balance);
+            let randCode = "HMK-" + Math.floor(100000 + Math.random() * 900000);
+            setTimeout(() => {
+                gameState.balance += reward;
+                animateBalanceDisplay(gameState.balance);
+                checkAchievementsRealtime();
+                saveUserData();
+            }, 1000);
+            alert(`⚡ PROSES JOKI BERHASIL!\n\nKode: ${randCode}`);
+        }
+
+        function startBonusTracker() {
+            let timeLeft = 300;
+            if(bonusTimerInterval) clearInterval(bonusTimerInterval);
+            bonusTimerInterval = setInterval(() => {
+                if (!currentUser) return;
+                timeLeft--;
+                let mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                let secs = (timeLeft % 60).toString().padStart(2, '0');
+                document.getElementById("bonus-countdown").innerText = `${mins}:${secs}`;
+                if(timeLeft <= 0) {
+                    timeLeft = 300;
+                    gameState.balance += 50000;
+                    animateBalanceDisplay(gameState.balance);
+                    checkAchievementsRealtime();
+                }
+            }, 1000);
+      }
+        function initGrid() {
+            for(let i = 0; i < 4; i++) {
+                const container = document.getElementById(`reel-${i}`);
+                if(!container) continue;
+                container.innerHTML = "";
+                for(let j = 0; j < 15; j++) {
+                    const cell = document.createElement("div");
+                    cell.className = "symbol-cell";
+                    cell.innerText = POOL_SIMBOLS[Math.floor(Math.random() * POOL_SIMBOLS.length)];
+                    container.appendChild(cell);
+                }
+                container.style.transform = `translateY(-968px)`;
+            }
+        }
+
+        function generateMatrix() {
+            let matrix = [];
+            let isLoseSpin = Math.random() < 0.60; 
+            let buffHoki = ((gameState.level - 1) * 5) / 100;
+            let scatterChance = 0.05 + buffHoki;
+            let multChance = 0.08 + buffHoki;
+
+            if (gameState.isLuckActive) {
+                isLoseSpin = Math.random() < 0.35; 
+                scatterChance += 0.12;
+                multChance += 0.18;
+            }
+
+            if (isLoseSpin) {
+                let avail = [...POOL_SIMBOLS];
+                for (let i = avail.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [avail[i], avail[j]] = [avail[j], avail[i]];
+                }
+                for(let r = 0; r < 4; r++) {
+                    matrix[r] = [];
+                    for(let c = 0; c < 4; c++) { matrix[r][c] = avail[(r + c) % avail.length]; }
+                }
+                return matrix;
+            }
+
+            for(let r = 0; r < 4; r++) {
+                matrix[r] = [];
+                for(let c = 0; c < 4; c++) {
+                    let rand = Math.random();
+                    if(rand < scatterChance) matrix[r][c] = SCATTER_SYMBOL;
+                    else if(rand < scatterChance + multChance) matrix[r][c] = MULTIPLIERS[Math.floor(Math.random() * MULTIPLIERS.length)];
+                    else matrix[r][c] = POOL_SIMBOLS[Math.floor(Math.random() * POOL_SIMBOLS.length)];
+                }
+            }
+            return matrix;
+        }
+
+        function startSpin() {
+            if(gameState.isSpinning) return;
+            
+            if(!gameState.isFreeSpinMode) {
+                let currentBet = parseInt(document.getElementById("bet-amount").value) || 0;
+                gameState.bet = currentBet;
+                if(gameState.balance < gameState.bet) {
+                    triggerNotification("Gagal Spin", "Saldo tidak mencukupi.", "error");
+                    if(gameState.isAutoSpin) toggleAutoSpin();
+                    return;
+                }
+                gameState.balance -= gameState.bet;
+                animateBalanceDisplay(gameState.balance);
+                addExperience(gameState.bet);
+                saveUserData();
+            }
+
+            gameState.isSpinning = true;
+            document.getElementById("spin-btn").disabled = true;
+            document.getElementById("bet-amount").disabled = true;
+
+            const finalMatrix = generateMatrix();
+            gameState.gridData = finalMatrix;
+            const duration = [1200, 1500, 1800, 2100];
+            
+            for(let i = 0; i < 4; i++) {
+                const container = document.getElementById(`reel-${i}`);
+                if(!container) continue;
+                container.innerHTML = "";
+                for(let j = 0; j < 30; j++) {
+                    const cell = document.createElement("div");
+                    cell.className = "symbol-cell";
+                    if(j >= 26 && j <= 29) cell.innerText = finalMatrix[j - 26][i];
+                    else cell.innerText = POOL_SIMBOLS[Math.floor(Math.random() * POOL_SIMBOLS.length)];
+                    container.appendChild(cell);
+                }
+                container.style.transition = "none";
+                container.style.transform = "translateY(0px)";
+                
+                setTimeout(() => {
+                    container.style.transition = `transform ${duration[i]}ms cubic-bezier(0.25, 0.1, 0.05, 1.02)`;
+                    container.style.transform = `translateY(-2392px)`;
+                    for(let k=0; k<container.children.length; k++){ container.children[k].style.animation = "blurSpin 0.2s infinite linear"; }
+                }, 20);
+
+                setTimeout(() => {
+                    for(let k=0; k<container.children.length; k++){ container.children[k].style.animation = "none"; }
+                    if(i === 3) evaluateResults();
+                }, duration[i] + 40);
+            }
+        }
+
+        function evaluateResults() {
+            const matrix = gameState.gridData;
+            let scatterPositions = [];
+            let winSymbolsCount = {};
+            let multiplierSum = 1;
+
+            for(let r = 0; r < 4; r++) {
+                for(let c = 0; c < 4; r++, c++) {
+                    if (c >= 4) break;
+                    let item = matrix[r][c];
+                    if(item === SCATTER_SYMBOL) { scatterPositions.push({r, c}); } 
+                    else if(MULTIPLIERS.includes(item)) {
+                        let val = parseInt(item.replace(/[^0-9]/g, '')) || 1;
+                        multiplierSum += val;
+                        highlightCell(r, c, "winning-glow");
+                    } else {
+                        winSymbolsCount[item] = winSymbolsCount[item] || [];
+                        winSymbolsCount[item].push({r, c});
+                    }
+                }
+                if (r >= 3) r = 3;
+            }
+
+            let baseWinTotal = 0;
+            for(let sym in winSymbolsCount) {
+                let coords = winSymbolsCount[sym];
+                if(coords.length >= 4) {
+                    let individualWin = gameState.bet * (coords.length * 0.6);
+                    baseWinTotal += individualWin;
+                    coords.forEach(coord => highlightCell(coord.r, coord.c, "winning-glow"));
+                }
+            }
+
+            let finalPayout = Math.floor(baseWinTotal * multiplierSum);
+
+            if(scatterPositions.length >= 3) {
+                scatterPositions.forEach(coord => highlightCell(coord.r, coord.c, "scatter-glow"));
+                setTimeout(() => { triggerScatterFeature(); }, 600);
+            }
+
+            if(finalPayout > 0) {
+                gameState.balance += finalPayout;
+                if(gameState.isFreeSpinMode) gameState.totalFsWin += finalPayout;
+                document.getElementById("win-val").innerText = "Rp" + finalPayout.toLocaleString("id-ID");
+                animateBalanceDisplay(gameState.balance);
+                triggerNotification("WIN MATCH", `Hadiah Rp ${finalPayout.toLocaleString("id-ID")}`, "gold");
+            } else {
+                if(!gameState.isFreeSpinMode && scatterPositions.length < 3) { document.getElementById("win-val").innerText = "Rp0"; }
+            }
+
+            checkAchievementsRealtime();
+
+            setTimeout(() => {
+                clearHighlights();
+                gameState.isSpinning = false;
+                
+                if(gameState.isFreeSpinMode) {
+                    gameState.freeSpinsLeft--;
+                    document.getElementById("fs-count-val").innerText = gameState.freeSpinsLeft;
+                    if(gameState.freeSpinsLeft <= 0) endFreeSpinMode();
+                    else setTimeout(() => { startSpin(); }, 1000);
+                } else {
+                    document.getElementById("spin-btn").disabled = false;
+                    document.getElementById("bet-amount").disabled = false;
+                    if(gameState.isAutoSpin) setTimeout(() => { if(gameState.isAutoSpin) startSpin(); }, 400);
+                }
+            }, 1200);
+        }
+
+        function highlightCell(r, c, className) {
+            const reel = document.getElementById(`reel-${c}`);
+            if(reel && reel.children[26 + r]) reel.children[26 + r].classList.add(className);
+        }
+
+        function clearHighlights() {
+            for(let c = 0; c < 4; c++) {
+                const reel = document.getElementById(`reel-${c}`);
+                if(reel) {
+                    for(let i = 0; i < reel.children.length; i++) { reel.children[i].classList.remove("winning-glow", "scatter-glow"); }
+                }
+            }
+        }
+
+        function triggerScatterFeature() {
+            if(gameState.isFreeSpinMode) return;
+            gameState.isFreeSpinMode = true;
+            gameState.freeSpinsLeft = 10;
+            gameState.totalFsWin = 0;
+            document.body.classList.add("scatter-mode");
+            document.getElementById("fs-overlay").style.display = "block";
+            
+            const banner = document.getElementById("fs-banner");
+            banner.classList.add("active");
+
+            setTimeout(() => {
+                banner.classList.remove("active");
+                document.getElementById("fs-counter-box").style.display = "block";
+                document.getElementById("fs-count-val").innerText = gameState.freeSpinsLeft;
+                setTimeout(() => { startSpin(); }, 600);
+            }, 2500);
+        }
+
+        function endFreeSpinMode() {
+            gameState.isFreeSpinMode = false;
+            document.body.classList.remove("scatter-mode");
+            document.getElementById("fs-overlay").style.display = "none";
+            document.getElementById("fs-counter-box").style.display = "none";
+            triggerNotification("Free Spin Selesai", `Total dapat Rp${gameState.totalFsWin.toLocaleString("id-ID")}`, "gold");
+            document.getElementById("spin-btn").disabled = false;
+            document.getElementById("bet-amount").disabled = false;
+            if(gameState.isAutoSpin) setTimeout(() => { if(gameState.isAutoSpin) startSpin(); }, 600);
+        }
+    </script>
+</body>
+</html>
