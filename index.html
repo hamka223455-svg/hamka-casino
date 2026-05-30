@@ -54,6 +54,86 @@
             opacity: 0;
             visibility: hidden;
         }
+
+/* =========================================================
+   PUBLIC CHAT BOX PREMIUM NEON STYLE
+   ========================================================= */
+.chat-box-container {
+    background: var(--bg-dark, #07030d);
+    border: 2px solid var(--neon-purple, #9d4edd);
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 12px;
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.2);
+}
+.chat-box-header {
+    font-size: 13px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--neon-cyan, #00ffff);
+    border-bottom: 1px solid var(--neon-purple, #9d4edd);
+    padding-bottom: 5px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chat-messages {
+    height: 140px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 4px;
+    margin-bottom: 8px;
+}
+.chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--neon-purple, #9d4edd);
+    border-radius: 4px;
+}
+.message-item {
+    font-size: 12px;
+    line-height: 15px;
+    word-break: break-all;
+}
+.chat-username {
+    font-weight: bold;
+    color: var(--neon-magenta, #ff007f);
+}
+.chat-text {
+    color: #ffffff;
+}
+.chat-input-area {
+    display: flex;
+    gap: 6px;
+}
+.chat-input-area input {
+    flex: 1;
+    background: rgba(18, 8, 30, 0.9);
+    border: 1px solid var(--neon-purple, #9d4edd);
+    color: #fff;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+}
+.chat-input-area input:focus {
+    border-color: var(--neon-cyan, #00ffff);
+}
+.btn-send-chat {
+    background: linear-gradient(45deg, var(--neon-purple), var(--neon-magenta));
+    border: none;
+    color: #fff;
+    padding: 0 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+        
         .auth-box {
             background: var(--panel-bg);
             border: 2px solid var(--neon-purple);
@@ -535,6 +615,21 @@
                     <button class="btn-spin" id="spin-btn" onclick="startSpin()">SPIN</button>
                     <button class="btn-auto-spin" id="auto-spin-btn" onclick="toggleAutoSpin()">AUTO</button>
                 </div>
+
+<div class="chat-box-container">
+    <div class="chat-box-header">
+        <span>💬 Chat Publik Live</span>
+        <span style="font-size: 9px; color: #4af24a; font-weight: normal;">● Online Server</span>
+    </div>
+    
+    <div class="chat-messages" id="chat-box-messages">
+        </div>
+    
+    <div class="chat-input-area">
+        <input type="text" id="chat-user-msg" placeholder="Ketik pesan di sini..." maxlength="80" onkeydown="if(event.key === 'Enter') sendPublicChat()">
+        <button class="btn-send-chat" onclick="sendPublicChat()">KIRIM</button>
+    </div>
+</div>
                 
                 <div class="tab-menu-container">
                     <button class="btn-sub-menu" onclick="toggleModal('topup-modal', true)">🛒 TOP UP DIAMOND</button>
@@ -701,6 +796,27 @@
 
     <div class="notification-container" id="notif-box"></div>
     <div class="bonus-timer-toast"><div class="bonus-circle"></div><div>Bonus Aktif 5 Menit: <span id="bonus-countdown" style="font-family: monospace; font-weight: bold; color: var(--neon-green);">05:00</span></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCHNa9G21ktnLNpDovLUWlbu7yFD638G64",
+    authDomain: "lightlives.firebaseapp.com",
+    databaseURL: "https://lightlives-default-rtdb.firebaseio.com",
+    projectId: "lightlives",
+    storageBucket: "lightlives.firebasestorage.app",
+    messagingSenderId: "1092994577733",
+    appId: "1:1092994577733:web:b9e2edf3e07faacd217a2c",
+    measurementId: "G-K4Q8KFG5MJ"
+  };
+  
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+</script>
+    
     <script>
         const POOL_SIMBOLS = ["💎", "🍒", "🍋", "🔔", "⭐", "🍀", "7️⃣", "🍇"];
         const SCATTER_SYMBOL = "🀄";
@@ -1492,6 +1608,76 @@ function evaluateResults() {
             document.getElementById("bet-amount").disabled = false;
             if(gameState.isAutoSpin) setTimeout(() => { if(gameState.isAutoSpin) startSpin(); }, 600);
         }
+
+// ==============================================================================
+// CORE LOGIC MODULE: FIREBASE REALTIME PUBLIC CHAT SYSTEM
+// ==============================================================================
+
+// A. Fungsi Mengirim Pesan ke Server Firebase
+function sendPublicChat() {
+    const msgInput = document.getElementById("chat-user-msg");
+    const textStr = msgInput.value.trim();
+    
+    // Validasi pencegahan pesan kosong
+    if (!textStr) return;
+
+    // Ambil ID user aktif (jika variabel custom tidak ada, otomatis pakai fallback 'Player')
+    let senderName = (typeof currentUser !== 'undefined') ? currentUser : "Player";
+    if (gameState && gameState.playerLevel) {
+        senderName += ` [LV ${gameState.playerLevel}]`;
+    }
+
+    // Ambil referensi path '/public_chats' di Firebase
+    const chatRef = firebase.database().ref('public_chats');
+    
+    // Push data baru dengan timestamp server
+    chatRef.push({
+        username: senderName,
+        message: textStr,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+        msgInput.value = ""; // Kosongkan kolom input setelah berhasil kirim
+    }).catch((err) => {
+        alert("Gagal kirim chat: " + err.message);
+    });
+}
+
+// B. Listener Otomatis Mengambil & Menampilkan Pesan Secara Realtime
+function listenPublicChat() {
+    const chatContainer = document.getElementById("chat-box-messages");
+    if (!chatContainer) return;
+
+    // Batasi database hanya menarik 40 obrolan terakhir agar tidak lemot
+    firebase.database().ref('public_chats').limitToLast(40).on('value', (snapshot) => {
+        chatContainer.innerHTML = ""; // Bersihkan kontainer chat lama
+        
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const data = childSnapshot.val();
+                
+                // Struktur susunan elemen pesan per baris
+                let msgDiv = document.createElement("div");
+                msgDiv.className = "message-item";
+                msgDiv.innerHTML = `<span class="chat-username">${data.username}:</span> <span class="chat-text">${data.message}</span>`;
+                
+                chatContainer.appendChild(msgDiv);
+            });
+            
+            // Otomatis gulir scrollbar ke baris paling bawah saat ada pesan baru masuk
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        } else {
+            chatContainer.innerHTML = `<div style="text-align:center; font-size:11px; color:#555; padding-top:40px;">Belum ada obrolan. Mulai menyapa!</div>`;
+        }
+    });
+}
+
+// C. Daftarkan fungsi listener agar aktif otomatis saat website pertama kali dimuat
+const oldOnload = window.onload;
+window.onload = function() {
+    if (typeof oldOnload === 'function') oldOnload();
+    listenPublicChat(); // Aktifkan radar chat online
+};
+        
     </script>
 </body>
 </html>
