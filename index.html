@@ -777,29 +777,27 @@
 
     <!-- MODAL 4: PRESTASI -->
     <div class="modal-overlay" id="achieve-modal">
-        <div class="modal-box">
-            <div class="modal-close" onclick="toggleModal('achieve-modal', false)">&times;</div>
-            <div class="modal-title">🏆 PRESTASI PENCAPAIAN GAME</div>
-            <div style="max-height: 380px; overflow-y: auto;" id="achievements-list-container">
-                <!-- PRESTASI LAMA -->
-                <div class="achievement-row" id="ach-m1M"><div><h4>Prestasi 1.000.000</h4><p style="font-size:12px; color:#aaa;">Raih total uang menyentuh Rp1.000.000</p></div><div id="badge-container-m1M"></div></div>
-                <div class="achievement-row" id="ach-lv10"><div><h4>Prestasi Level 10</h4><p style="font-size:12px; color:#aaa;">Berhasil Rebirth hingga mencapai Level 10</p></div><div id="badge-container-lv10"></div></div>
-                <div class="achievement-row" id="ach-lv50"><div><h4>Prestasi Level 50</h4><p style="font-size:12px; color:#aaa;">Berhasil Rebirth hingga mencapai Level 50</p></div><div id="badge-container-lv50"></div></div>
-                <div class="achievement-row" id="ach-lv100"><div><h4>Prestasi Penamat Game</h4><p style="font-size:12px; color:#aaa;">Tamatkan Game pada Level 100 (Reset Data!)</p></div><div id="badge-container-lv100"></div></div>
-                <div class="achievement-row" id="ach-king"><div><h4>Prestasi The King Game</h4><p style="font-size:12px; color:#aaa;">Mencapai nominal uang Rp50.000.000.000.000</p></div><div id="badge-container-king"></div></div>
-                <!-- PRESTASI BARU -->
-                <div class="achievement-row" id="ach-diaKing"><div><h4>Prestasi Diamond King</h4><p style="font-size:12px; color:#aaa;">Memiliki saldo Diamond menyentuh 5.000 💎</p></div><div id="badge-container-diaKing"></div></div>
-                <div class="achievement-row" id="ach-empDia"><div><h4>Prestasi Emperor Diamond</h4><p style="font-size:12px; color:#aaa;">Memiliki saldo Diamond menyentuh 1.000.000 💎</p></div><div id="badge-container-empDia"></div></div>
-            </div>
+      <div class="modal-box">
+        <div class="modal-close" onclick="toggleModal('achieve-modal', false)">&times;</div>
+        <div class="modal-title">🏆 PRESTASI PENCAPAIAN GAME</div>
+        <div style="max-height: 380px; overflow-y: auto;" id="achievements-list-container">
+          <div class="achievement-row" id="ach-m1M"><div><h4>Prestasi 1.000.000</h4><p style="font-size:12px; color:#aaa;">Raih total kemenangan 1M</p></div></div>
+          <div class="achievement-row" id="ach-lv10"><div><h4>Prestasi Level 10</h4><p style="font-size:12px; color:#aaa;">Berhasil mencapai Level 10</p></div></div>
+          <div class="achievement-row" id="ach-lv50"><div><h4>Prestasi Level 50</h4><p style="font-size:12px; color:#aaa;">Berhasil mencapai Level 50</p></div></div>
+          <div class="achievement-row" id="ach-lv100"><div><h4>Prestasi Penamat Game</h4><p style="font-size:12px; color:#aaa;">Tamatkan game sampai Level 100</p></div></div>
+          <div class="achievement-row" id="ach-king"><div><h4>Prestasi The King Game</h4><p style="font-size:12px; color:#aaa;">Menjadi top player terkaya</p></div></div>
+          <div class="achievement-row" id="ach-diaKing"><div><h4>Prestasi Diamond King</h4><p style="font-size:12px; color:#aaa;">Miliki total 10.000 Diamond</p></div></div>
+          <div class="achievement-row" id="ach-empDia"><div><h4>Prestasi Emperor Diamond</h4><p style="font-size:12px; color:#aaa;">Miliki total 100.000 Diamond</p></div></div>
         </div>
+      </div>
     </div>
 
     <div class="notification-container" id="notif-box"></div>
-    <div class="bonus-timer-toast"><div class="bonus-circle"></div><div>Bonus Aktif 5 Menit: <span id="bonus-countdown" style="font-family: monospace; font-weight: bold; color: var(--neon-green);">05:00</span></div></div>
+    <div class="bonus-timer-toast"><div class="bonus-circle"></div><div>Bonus Aktif 5 Menit: <span id="bonus-countdown"></span></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
+    
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyCHNa9G21ktnLNpDovLUWlbu7yFD638G64",
